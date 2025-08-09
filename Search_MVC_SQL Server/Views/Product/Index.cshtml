@@ -1,0 +1,64 @@
+﻿@using Search_MVC_SQL_Server.Models
+@{
+    var categories = ViewBag.Categories as List<Category>;
+}
+
+<select id="categorySelect">
+    <option value="">-- Chọn danh mục --</option>
+    @foreach (var cat in categories)
+    {
+        <option value="@cat.Id">@cat.CategoryName</option>
+    }
+</select>
+
+<input type="text" id="searchInput" placeholder="Nhập tên sản phẩm..." />
+<button id="btnSearch">Tìm kiếm</button>
+
+<div id="overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:1000;text-align:center;padding-top:20%;">
+    <h2>Đang tìm kiếm...</h2>
+</div>
+
+<div id="productList">
+    @await Html.PartialAsync("_ProductListPartial", new List<Product>())
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function searchProducts() {
+            var categoryId = $("#categorySelect").val();
+            var productName = $("#searchInput").val();
+            $("#overlay").show();
+
+            $.ajax({
+                url: "/Product/Search",
+                type: "GET",
+                data: {
+                    categoryId: categoryId,
+                    productName: productName
+                },
+                success: function (result) {
+                    $("#productList").html(result);
+                    $("#overlay").hide();
+                },
+                error: function () {
+                    alert("Lỗi khi tìm kiếm.");
+                    $("#overlay").hide();
+                }
+            });
+        }
+
+        $("#btnSearch").click(searchProducts);
+
+        $("#searchInput").keydown(function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                searchProducts();
+            }
+        });
+
+        $("#categorySelect").change(function () {
+            searchProducts();
+        });
+    </script>
+}

@@ -1,0 +1,10 @@
+﻿@model IEnumerable<Search_MVC_SQL_Server.Models.Product>
+Có <b>@Model.Count()</b> sản phẩm
+<ul>
+    @foreach (var item in Model)
+    {
+        <li>
+            <strong>@item.ProductName</strong>
+        </li>
+    }
+</ul>
